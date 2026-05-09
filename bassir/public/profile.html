@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>بصير — حسابي</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+.cover {
+  height: 220px; position: relative; overflow: hidden;
+  background: linear-gradient(135deg, #0a1628 0%, #1a3a2a 40%, #2a1a0a 100%);
+}
+.cover-glow {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(circle at 20% 50%, rgba(200,245,100,0.12) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(100,212,245,0.10) 0%, transparent 40%);
+}
+.cover-edit-btn { position: absolute; bottom: 16px; left: 16px; }
+
+.profile-wrap { max-width: 1100px; margin: 0 auto; padding: 0 32px; }
+
+.avatar-wrap  { position: relative; display: inline-block; margin-top: -64px; margin-bottom: 16px; }
+.avatar-ring  { position: absolute; inset: -6px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent2)); opacity: 0.35; z-index: 1; }
+.profile-avatar { width: 128px; height: 128px; border-radius: 50%; border: 4px solid var(--bg); background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-size: 48px; font-weight: 700; color: #000; position: relative; z-index: 2; }
+.verified-badge { position: absolute; bottom: 6px; left: 6px; width: 28px; height: 28px; border-radius: 50%; background: var(--accent); border: 2px solid var(--bg); display: flex; align-items: center; justify-content: center; z-index: 3; color: #000; }
+.verified-badge svg { width: 14px; height: 14px; stroke: #000; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+
+.profile-meta     { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; }
+.profile-name     { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+.profile-handle   { font-size: 14px; color: var(--muted); margin-bottom: 8px; font-family: var(--font-mono); }
+.profile-bio      { font-size: 14px; color: rgba(255,255,255,0.7); line-height: 1.6; max-width: 480px; }
+.profile-location { font-size: 13px; color: var(--muted); margin-top: 8px; display: flex; align-items: center; gap: 5px; }
+.profile-location svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+.stats-bar { display: flex; gap: 32px; padding: 20px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin-bottom: 32px; flex-wrap: wrap; }
+
+/* VIDEO GRID */
+.videos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px,1fr)); gap: 12px; }
+.video-card  { border-radius: var(--radius-md); overflow: hidden; cursor: pointer; position: relative; aspect-ratio: 9/16; background: var(--surface2); border: 1px solid var(--border); transition: transform 0.2s, border-color 0.2s; }
+.video-card:hover { transform: scale(1.02); border-color: rgba(200,245,100,0.3); }
+.video-thumb { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 56px; }
+.video-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 55%); display: flex; flex-direction: column; justify-content: flex-end; padding: 12px; }
+.video-card-title { font-size: 12px; font-weight: 600; line-height: 1.4; margin-bottom: 4px; }
+.video-card-views { font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 4px; }
+.video-card-views svg { width: 11px; height: 11px; stroke: currentColor; fill: none; stroke-width: 2; }
+.video-cat-tag  { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.65); backdrop-filter: blur(6px); border: 1px solid var(--border); font-size: 10px; padding: 3px 9px; border-radius: var(--radius-full); display: flex; align-items: center; gap: 4px; }
+.video-cat-tag svg { width: 10px; height: 10px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.video-likes-tag { position: absolute; top: 10px; left: 10px; font-size: 11px; color: rgba(255,255,255,0.8); display: flex; align-items: center; gap: 3px; }
+.video-likes-tag svg { width: 11px; height: 11px; stroke: currentColor; fill: none; stroke-width: 2; }
+.pinned-tag { position: absolute; top: 34px; right: 10px; background: rgba(200,245,100,0.15); border: 1px solid rgba(200,245,100,0.3); color: var(--accent); font-size: 9px; padding: 2px 7px; border-radius: var(--radius-full); display: flex; align-items: center; gap: 3px; }
+.pinned-tag svg { width: 9px; height: 9px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+/* ABOUT */
+.about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.about-row  { display: flex; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+.about-row:last-child { border-bottom: none; }
+.about-icon { color: var(--muted); flex-shrink: 0; }
+.about-icon svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.about-lbl  { font-size: 13px; color: var(--muted); min-width: 80px; }
+.about-val  { font-size: 13px; font-weight: 500; }
+
+.skill-bar-wrap { flex: 1; }
+.skill-bar  { height: 4px; background: var(--surface3); border-radius: 4px; overflow: hidden; }
+.skill-fill { height: 100%; background: var(--accent); border-radius: 4px; }
+
+.achievements { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+.badge-item { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 10px 14px; display: flex; align-items: center; gap: 10px; }
+.badge-item-icon { color: var(--accent); flex-shrink: 0; }
+.badge-item-icon svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.badge-item-name { font-size: 12px; font-weight: 600; }
+.badge-item-desc { font-size: 10px; color: var(--muted); }
+
+@media (max-width: 768px) {
+  .profile-wrap { padding: 0 16px; }
+  .about-grid   { grid-template-columns: 1fr; }
+  .videos-grid  { grid-template-columns: repeat(2,1fr); }
+  .stats-bar    { gap: 20px; }
+}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="index.html" class="nav-logo">بصير</a>
+  <div class="nav-links">
+    <a href="index.html"  class="btn"><i data-lucide="arrow-right"></i> الرئيسية</a>
+    <a href="upload.html" class="btn btn-primary"><i data-lucide="upload"></i> رفع مقطع</a>
+  </div>
+</nav>
+
+<div class="cover">
+  <div class="cover-glow"></div>
+  <button class="btn btn-secondary cover-edit-btn" onclick="alert('تعديل صورة الغلاف')">
+    <i data-lucide="camera"></i> تعديل الغلاف
+  </button>
+</div>
+
+<div class="profile-wrap">
+  <div class="avatar-wrap">
+    <div class="avatar-ring"></div>
+    <div class="profile-avatar">أ</div>
+    <div class="verified-badge"><i data-lucide="check"></i></div>
+  </div>
+
+  <div class="profile-meta">
+    <div>
+      <div class="profile-name">أحمد بن عمر</div>
+      <div class="profile-handle">@ahmed.visuals</div>
+      <div class="profile-bio">مصوّر بصري ومحب للجمال الطبيعي<br>أشارك لحظات تجعل عينيك تستريح من ضجيج اليوم</div>
+      <div class="profile-location">
+        <i data-lucide="map-pin"></i> وهران، الجزائر ·
+        <i data-lucide="calendar"></i> عضو منذ 2024
+      </div>
+    </div>
+    <div class="flex gap-8 mt-8">
+      <button class="btn btn-primary btn-lg" id="followBtn" onclick="toggleFollow()">
+        <i data-lucide="user-plus"></i> متابعة
+      </button>
+      <button class="btn btn-secondary btn-lg" onclick="alert('الرسائل قادمة قريباً')">
+        <i data-lucide="message-circle"></i> رسالة
+      </button>
+      <button class="btn btn-icon btn-secondary" onclick="alert('مشاركة الملف الشخصي')">
+        <i data-lucide="share-2"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat-item"><div class="stat-num" id="followersCount">12.4K</div><div class="stat-label">متابع</div></div>
+    <div class="stat-item"><div class="stat-num">348</div><div class="stat-label">متابَع</div></div>
+    <div class="stat-item"><div class="stat-num">24</div><div class="stat-label">مقطع</div></div>
+    <div class="stat-item"><div class="stat-num">1.2M</div><div class="stat-label">مشاهدة</div></div>
+    <div class="stat-item"><div class="stat-num">89.6K</div><div class="stat-label">إعجاب</div></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab(this,'videos')">
+      <i data-lucide="play-circle"></i> مقاطعي
+    </button>
+    <button class="tab" onclick="switchTab(this,'saved')">
+      <i data-lucide="bookmark"></i> المحفوظات
+    </button>
+    <button class="tab" onclick="switchTab(this,'liked')">
+      <i data-lucide="heart"></i> الإعجابات
+    </button>
+    <button class="tab" onclick="switchTab(this,'about')">
+      <i data-lucide="user"></i> حول
+    </button>
+  </div>
+
+  <!-- VIDEOS -->
+  <div id="tab-videos">
+    <div class="videos-grid" id="videosGrid"></div>
+  </div>
+
+  <!-- SAVED -->
+  <div id="tab-saved" style="display:none">
+    <div class="empty-state">
+      <div class="empty-state-icon"><i data-lucide="bookmark"></i></div>
+      <div class="empty-state-title">لا توجد مقاطع محفوظة بعد</div>
+      <div class="empty-state-text">ابدأ بحفظ ما يعجبك من الخلاصة</div>
+    </div>
+  </div>
+
+  <!-- LIKED -->
+  <div id="tab-liked" style="display:none">
+    <div class="empty-state">
+      <div class="empty-state-icon"><i data-lucide="heart"></i></div>
+      <div class="empty-state-title">لا توجد إعجابات بعد</div>
+      <div class="empty-state-text">المقاطع التي تعجبك ستظهر هنا</div>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <div id="tab-about" style="display:none; padding-bottom:60px">
+    <div class="about-grid">
+
+      <div class="card">
+        <div class="card-title mb-16">معلومات</div>
+        <div class="about-row">
+          <div class="about-icon"><i data-lucide="map-pin"></i></div>
+          <div class="about-lbl">الموقع</div>
+          <div class="about-val">وهران، الجزائر</div>
+        </div>
+        <div class="about-row">
+          <div class="about-icon"><i data-lucide="calendar"></i></div>
+          <div class="about-lbl">العضوية</div>
+          <div class="about-val">يناير 2024</div>
+        </div>
+        <div class="about-row">
+          <div class="about-icon"><i data-lucide="link"></i></div>
+          <div class="about-lbl">الموقع</div>
+          <div class="about-val text-accent2">ahmed-visuals.dz</div>
+        </div>
+        <div class="about-row">
+          <div class="about-icon"><i data-lucide="camera"></i></div>
+          <div class="about-lbl">المعدات</div>
+          <div class="about-val">Sony A7 IV · iPhone 15 Pro</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title mb-16">التخصصات</div>
+        <div class="about-row" style="gap:12px">
+          <div style="font-size:13px;min-width:110px;display:flex;align-items:center;gap:6px"><i data-lucide="leaf" style="width:13px;height:13px"></i> طبيعة</div>
+          <div class="skill-bar-wrap"><div class="skill-bar"><div class="skill-fill" style="width:90%"></div></div></div>
+          <div class="text-xs text-muted mono">90%</div>
+        </div>
+        <div class="about-row" style="gap:12px">
+          <div style="font-size:13px;min-width:110px;display:flex;align-items:center;gap:6px"><i data-lucide="waves" style="width:13px;height:13px"></i> بحر</div>
+          <div class="skill-bar-wrap"><div class="skill-bar"><div class="skill-fill" style="width:75%"></div></div></div>
+          <div class="text-xs text-muted mono">75%</div>
+        </div>
+        <div class="about-row" style="gap:12px">
+          <div style="font-size:13px;min-width:110px;display:flex;align-items:center;gap:6px"><i data-lucide="landmark" style="width:13px;height:13px"></i> عمارة</div>
+          <div class="skill-bar-wrap"><div class="skill-bar"><div class="skill-fill" style="width:60%"></div></div></div>
+          <div class="text-xs text-muted mono">60%</div>
+        </div>
+        <div class="about-row" style="gap:12px">
+          <div style="font-size:13px;min-width:110px;display:flex;align-items:center;gap:6px"><i data-lucide="palette" style="width:13px;height:13px"></i> فن بصري</div>
+          <div class="skill-bar-wrap"><div class="skill-bar"><div class="skill-fill" style="width:45%"></div></div></div>
+          <div class="text-xs text-muted mono">45%</div>
+        </div>
+      </div>
+
+      <div class="card" style="grid-column:1/-1">
+        <div class="card-title mb-16">الإنجازات</div>
+        <div class="achievements">
+          <div class="badge-item">
+            <div class="badge-item-icon"><i data-lucide="trophy"></i></div>
+            <div><div class="badge-item-name">صانع محتوى</div><div class="badge-item-desc">أكثر من 1M مشاهدة</div></div>
+          </div>
+          <div class="badge-item">
+            <div class="badge-item-icon"><i data-lucide="flame"></i></div>
+            <div><div class="badge-item-name">مميز</div><div class="badge-item-desc">مقطع في الصفحة الرئيسية</div></div>
+          </div>
+          <div class="badge-item">
+            <div class="badge-item-icon"><i data-lucide="star"></i></div>
+            <div><div class="badge-item-name">مبكر</div><div class="badge-item-desc">من أوائل المستخدمين</div></div>
+          </div>
+          <div class="badge-item">
+            <div class="badge-item-icon"><i data-lucide="gem"></i></div>
+            <div><div class="badge-item-name">مبدع</div><div class="badge-item-desc">10+ مقاطع مميزة</div></div>
+          </div>
+          <div class="badge-item">
+            <div class="badge-item-icon"><i data-lucide="globe"></i></div>
+            <div><div class="badge-item-name">عالمي</div><div class="badge-item-desc">متابعون من 30 دولة</div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const MY_VIDEOS = [
+  { title:'جبال الأطلس عند الغروب', bg:'linear-gradient(160deg,#ff6b35,#2c1654)', emoji:'🏔️', views:'198K', likes:'24.2K', catIcon:'leaf',     pinned:true  },
+  { title:'قصبة الجزائر',            bg:'linear-gradient(160deg,#0a2540,#64d4f5)', emoji:'🕌', views:'142K', likes:'18.7K', catIcon:'landmark',  pinned:false },
+  { title:'الصحراء الكبرى',          bg:'linear-gradient(160deg,#8B4513,#FFD700)', emoji:'🏜️', views:'320K', likes:'41.5K', catIcon:'leaf',     pinned:false },
+  { title:'شاطئ وهران',              bg:'linear-gradient(160deg,#006994,#ff8c00)', emoji:'🌊', views:'176K', likes:'29.8K', catIcon:'waves',     pinned:false },
+  { title:'فن الخط العربي',          bg:'linear-gradient(160deg,#1a1a2e,#0f3460)', emoji:'✍️', views:'211K', likes:'33.1K', catIcon:'palette',   pinned:false },
+  { title:'الكسكسي الملكي',          bg:'linear-gradient(160deg,#3d1c02,#d4880a)', emoji:'🍲', views:'440K', likes:'52.3K', catIcon:'utensils',  pinned:false },
+  { title:'غروب المتوسط',            bg:'linear-gradient(160deg,#1a0533,#ff6b6b)', emoji:'🌅', views:'88K',  likes:'12.1K', catIcon:'waves',     pinned:false },
+  { title:'أسواق القبة',             bg:'linear-gradient(160deg,#2d1b00,#c4860a)', emoji:'🏪', views:'67K',  likes:'9.4K',  catIcon:'landmark',  pinned:false },
+];
+
+// Inline SVG paths for video card icons
+const iconPaths = {
+  eye:      '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>',
+  heart:    '<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>',
+  pin:      '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>',
+  leaf:     '<path d="M2 22 16 8"/><path d="M16.47 7.35A9 9 0 0 1 20 15c0 3.87-2.5 6-8 7-5.5-1-8-3.13-8-7a9 9 0 0 1 3.53-7.65A9 9 0 0 1 12 6a9 9 0 0 1 4.47 1.35z"/>',
+  landmark: '<line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7"/>',
+  waves:    '<path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/>',
+  palette:  '<circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/>',
+  utensils: '<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>',
+};
+
+function isvg(name, size=11) {
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${iconPaths[name]||''}</svg>`;
+}
+
+function renderVideos() {
+  document.getElementById('videosGrid').innerHTML = MY_VIDEOS.map(v => `
+    <div class="video-card" onclick="window.location.href='index.html'">
+      <div class="video-thumb" style="background:${v.bg}">${v.emoji}</div>
+      <div class="video-cat-tag">${isvg(v.catIcon,10)}</div>
+      <div class="video-likes-tag">${isvg('heart',11)} ${v.likes}</div>
+      ${v.pinned ? `<div class="pinned-tag">${isvg('pin',9)} مثبت</div>` : ''}
+      <div class="video-overlay">
+        <div class="video-card-title">${v.title}</div>
+        <div class="video-card-views">${isvg('eye',11)} ${v.views}</div>
+      </div>
+    </div>`).join('');
+}
+
+function switchTab(el, tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  ['videos','saved','liked','about'].forEach(t => {
+    const el = document.getElementById('tab-'+t);
+    if (el) el.style.display = t===tab ? 'block' : 'none';
+  });
+}
+
+let following = false;
+function toggleFollow() {
+  following = !following;
+  const btn = document.getElementById('followBtn');
+  const cnt = document.getElementById('followersCount');
+  if (following) {
+    btn.innerHTML = '<i data-lucide="user-check"></i> متابَع';
+    btn.classList.replace('btn-primary','btn-secondary');
+    cnt.textContent = '12.5K';
+  } else {
+    btn.innerHTML = '<i data-lucide="user-plus"></i> متابعة';
+    btn.classList.replace('btn-secondary','btn-primary');
+    cnt.textContent = '12.4K';
+  }
+  lucide.createIcons({ nodes: [btn] });
+}
+
+renderVideos();
+window.addEventListener('load', () => lucide.createIcons());
+</script>
+</body>
+</html>

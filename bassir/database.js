@@ -1,18 +1,22 @@
-// database.js — إعداد قاعدة البيانات
-const initSqlJs = require('sql.js');
-const fs        = require('fs');
-const path      = require('path');
+// database.js — قاعدة البيانات باستخدام sql.js
+const path = require('path');
+const fs   = require('fs');
 
-const DB_PATH = path.join(__dirname, 'baseer.db');
+const DB_PATH = process.env.DB_PATH || path.join(__dirname, 'baseer.db');
 
-let db = null;
+let db   = null;
+let SQL  = null;
 
 async function getDB() {
   if (db) return db;
 
-  const SQL = await initSqlJs();
+  // تحميل sql.js مع تحديد مسار ملف WASM بشكل صريح
+  const sqlJsPath = path.dirname(require.resolve('sql.js'));
+  SQL = await require('sql.js')({
+    locateFile: file => path.join(sqlJsPath, file)
+  });
 
-  // Load existing DB file if it exists
+  // تحميل قاعدة البيانات من الملف إن وُجد
   if (fs.existsSync(DB_PATH)) {
     const fileBuffer = fs.readFileSync(DB_PATH);
     db = new SQL.Database(fileBuffer);
@@ -20,9 +24,11 @@ async function getDB() {
     db = new SQL.Database();
   }
 
-  // Save DB to disk helper
+  // دالة حفظ قاعدة البيانات على القرص
   db.save = () => {
     const data = db.export();
+    const dir  = path.dirname(DB_PATH);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
     fs.writeFileSync(DB_PATH, Buffer.from(data));
   };
 
@@ -86,10 +92,10 @@ function createTables() {
 
   db.run(`
     CREATE TABLE IF NOT EXISTS follows (
-      id          INTEGER PRIMARY KEY AUTOINCREMENT,
-      follower_id INTEGER NOT NULL,
+      id           INTEGER PRIMARY KEY AUTOINCREMENT,
+      follower_id  INTEGER NOT NULL,
       following_id INTEGER NOT NULL,
-      created_at  TEXT    DEFAULT (datetime('now')),
+      created_at   TEXT    DEFAULT (datetime('now')),
       UNIQUE(follower_id, following_id)
     )
   `);
@@ -105,10 +111,10 @@ function createTables() {
   `);
 
   db.save();
-  console.log('✅ قاعدة البيانات جاهزة');
+  console.log('Database ready:', DB_PATH);
 }
 
-// Helper: run query and return rows as objects
+// تنفيذ استعلام SELECT وإرجاع النتائج كمصفوفة من الكائنات
 function query(sql, params = []) {
   const stmt   = db.prepare(sql);
   const result = [];
@@ -120,11 +126,10 @@ function query(sql, params = []) {
   return result;
 }
 
-// Helper: run insert/update/delete
+// تنفيذ INSERT / UPDATE / DELETE
 function run(sql, params = []) {
   db.run(sql, params);
   db.save();
-  // Get last insert rowid
   const rows = query('SELECT last_insert_rowid() as id');
   return { lastID: rows[0]?.id };
 }
